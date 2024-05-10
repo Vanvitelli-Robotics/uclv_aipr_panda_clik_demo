@@ -1,0 +1,16 @@
+# Goal
+
+builtin_interfaces/Duration duration
+float64[] qf
+
+---
+
+# Result
+
+bool completed
+
+---
+
+# Feedbk
+
+builtin_interfaces/Duration time_left

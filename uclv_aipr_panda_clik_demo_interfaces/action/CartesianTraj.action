@@ -1,0 +1,16 @@
+# Goal
+
+builtin_interfaces/Duration duration
+geometry_msgs/Pose p0
+geometry_msgs/Pose pf
+
+---
+
+# Result
+bool completed
+
+---
+
+# Feedbk
+
+builtin_interfaces/Duration time_left
