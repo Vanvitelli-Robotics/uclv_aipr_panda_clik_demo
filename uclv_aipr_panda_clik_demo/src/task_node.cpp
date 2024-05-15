@@ -127,7 +127,7 @@ int main(int argc, char** argv)
   // goal cartesiano, lo dichiaro prima perchè lo uso per conservare p0 e pf
   uclv_aipr_panda_clik_demo_interfaces::action::CartesianTraj::Goal cartesian_goal;
 
-  // lettura pi (posa iniziale)
+  // lettura pi (posa iniziale) Uso tf per leggere la posa iniziale del robot
   {
     // Attesa dell'utente
     RCLCPP_INFO_STREAM(node->get_logger(),
@@ -164,7 +164,7 @@ int main(int argc, char** argv)
     std::cin >> ans;
   }
 
-  // scelta di pf (posa finale)
+  // scelta di pf (posa finale) - La scelgo come una traslazione lungo x y z (vedi sotto)
   {
     // Attesa dell'utente
     RCLCPP_INFO_STREAM(node->get_logger(), "Setto la posa finale... - Iserisci un carattere qualsiasi e premi invio:");
