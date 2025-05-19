@@ -31,6 +31,7 @@ class JointTrajActionServer : public rclcpp::Node
 
 protected:
   rclcpp_action::Server<JointTraj>::SharedPtr action_server_;
+  rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_sub_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_cmd_pub_;
 
   /*
@@ -53,6 +54,8 @@ public:
   {
     using namespace std::placeholders;
 
+    joint_state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>("joint_states", 1, std::bind(&JointTrajActionServer::joint_state_cb, this, _1));
+
     joint_cmd_pub_ = this->create_publisher<sensor_msgs::msg::JointState>("cmd/joint_position", 1);
 
     this->action_server_ = rclcpp_action::create_server<JointTraj>(
@@ -69,6 +72,13 @@ public:
   ~JointTrajActionServer() = default;
 
 protected:
+
+  sensor_msgs::msg::JointState::ConstSharedPtr joint_states_;
+  void joint_state_cb(const sensor_msgs::msg::JointState::ConstSharedPtr& msg)
+  {
+    joint_states_ = msg;
+  }
+
   rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID& uuid,
                                           std::shared_ptr<const JointTraj::Goal> goal)
   {
@@ -102,23 +112,18 @@ protected:
     /*
         Il seguente blocco serve per leggere la prima configurazione q0.
 
-        Questa struttura è molto utile quando si vuole leggere in continuazione un messaggio in un ciclo.
-        In generale la strategia è usare una variabile globale che è accessibile sia dalla callback del subscriber
+        Questa struttura è molto utile quando si vuole leggere un singolo nuovo messaggio.
+        In generale la strategia è usare una variabile globale (joint_states_ in questo caso) che è accessibile sia dalla callback del subscriber
         che dal ciclo stesso.
-
-        In questo caso particolare vogliamo leggere un singolo messaggio: il blocco seguente può essere sostituito con
-        ros::topic::waitForMessage<sensor_msgs::JointState>
     */
     // INIZIO BLOCCO PER LETTURA GIUNTI
     sensor_msgs::msg::JointState q0;
-    if (!rclcpp::wait_for_message<sensor_msgs::msg::JointState>(q0, shared_from_this(), "joint_states", 10s))
+    joint_states_ = nullptr;
+    while(!joint_states_)
     {
-      RCLCPP_ERROR(this->get_logger(), "Failed to get initial joint state");
-      auto result = std::make_shared<JointTraj::Result>();
-      result->completed = false;
-      goal_handle->abort(result);
-      return;
+      std::this_thread::sleep_for(500ns);
     }
+    q0 = *joint_states_;
     // FINE BLOCCO PER LETTURA GIUNTI
 
     // stampa per visualizzarla
