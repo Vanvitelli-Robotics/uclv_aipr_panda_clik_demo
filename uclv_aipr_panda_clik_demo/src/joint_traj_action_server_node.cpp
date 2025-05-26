@@ -1,5 +1,4 @@
 #include <rclcpp/rclcpp.hpp>
-#include <rclcpp/wait_for_message.hpp>
 
 #include <rclcpp_action/rclcpp_action.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
@@ -119,7 +118,7 @@ protected:
     // INIZIO BLOCCO PER LETTURA GIUNTI
     sensor_msgs::msg::JointState q0;
     joint_states_ = nullptr;
-    while(!joint_states_)
+    while(rclcpp::ok() && !joint_states_)
     {
       std::this_thread::sleep_for(500ns);
     }

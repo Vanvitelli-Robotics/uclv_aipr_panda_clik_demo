@@ -125,7 +125,6 @@ public:
 
     // timer of the main control loop
     // uso un timer che garantisce la giusto frequenza al clik
-    rclcpp::Duration period = rclcpp::Duration::from_seconds(Ts_);
     clik_timer_ = this->create_wall_timer(std::chrono::milliseconds((int)(Ts_ / 1000.0)),
                                           std::bind(&CLIKNode::clik_control_cycle, this));
     clik_timer_->cancel();  // <-- il timer è disattivato all'inizio
